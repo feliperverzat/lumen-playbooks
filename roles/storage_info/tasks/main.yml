@@ -10,8 +10,8 @@
     debug:
       msg: "{{ array_info['purefa_info'] }}"
 
-- name: Business Card
-    debug: msg="{{ array_info['purefa_info'] | json_query(jmesquery) }}"
-    vars:
-    jmesquery: "hosts[*].wwn[*]"
+  - name: Business Card
+      debug: msg="{{ array_info['purefa_info'] | json_query(jmesquery) }}"
+      vars:
+      jmesquery: "hosts[*].wwn[*]"
 ...
