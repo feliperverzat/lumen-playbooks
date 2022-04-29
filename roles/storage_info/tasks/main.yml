@@ -8,10 +8,10 @@
     register: array_info
   - name: show configuration information
     debug:
-      msg: "{{ array_info['purefa_info']['wwn[*]'] }}"
+      msg: "{{ array_info['purefa_info'] }}"
 
-#- name: Business Card
-       #debug: msg="{{ array_info.json | json_query(jmesquery) }}"
-       #vars:
-       #  jmesquery: "hosts[*].wwn[*]"
+- name: Business Card
+    debug: msg="{{ array_info['purefa_info'] | json_query(jmesquery) }}"
+    vars:
+    jmesquery: "hosts[*].wwn[*]"
 ...
