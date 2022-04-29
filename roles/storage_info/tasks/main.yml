@@ -8,7 +8,7 @@
     register: array_info
   - name: show configuration information
     debug:
-      msg: "{{ array_info['purefa_info']['config'] }}"
+      msg: "{{ array_info['purefa_info']['hosts'] }}"
 
 #- name: Business Card
        #debug: msg="{{ array_info.json | json_query(jmesquery) }}"
