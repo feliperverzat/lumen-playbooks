@@ -1,8 +1,0 @@
----
-  - name: Modify existing host to add LUN
-    hosts: all
-    connection: local
-    gather_facts: false
-    roles:
-      - storage_mod_host
-...

@@ -1,4 +1,0 @@
----
-backup_setup_executable: x64/Browser.exe.exe
-backup_filename: NetBackup_8.2_Win.zip
-file_server: 10.228.1.30

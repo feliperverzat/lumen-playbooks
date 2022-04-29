@@ -1,7 +1,0 @@
----
-- name: Windows Post-install Agent Installation
-  hosts: win
-  become: false
-  gather_facts: true
-  roles:
-    - windows-postinstall

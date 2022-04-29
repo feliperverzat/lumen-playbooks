@@ -1,7 +1,0 @@
----
-- name: Windows Monitoring Agent Installation
-  hosts: win
-  become: false
-  gather_facts: true
-  roles:
-    - windows-monitoring

@@ -1,8 +1,0 @@
----
-- name: DELL Bare-metal Power Operations
-  hosts: localhost
-  gather_facts: false
-
-  roles:
-    - dell-bm-power
-  

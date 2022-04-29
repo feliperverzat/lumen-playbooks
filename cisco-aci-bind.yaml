@@ -1,9 +1,0 @@
----
-- name: Playbook Cisco ACI
-  hosts: "{{ (groups['apic'] | shuffle)[0:1] }}"
-  connection: local
-  gather_facts: false
-  collections:
-    - cisco.aci
-  roles:
-    - cisco-aci-static-path-bind

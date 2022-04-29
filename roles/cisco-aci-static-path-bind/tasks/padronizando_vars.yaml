@@ -1,6 +1,0 @@
----
-- name: Padronizando dados
-  set_fact:
-    TENANT: "tn-{{ CLIENTE | lower }}"
-    EPG: "epg-{{ CLIENTE | lower }}"
-    APP: "app-{{ CLIENTE | lower }}"

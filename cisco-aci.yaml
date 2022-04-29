@@ -1,7 +1,0 @@
----
-- name: Playbook Cisco ACI
-  hosts: "{{ (groups['apic'] | shuffle)[0:1] }}"
-  connection: local
-  gather_facts: false
-  roles:
-    - cisco-aci-create

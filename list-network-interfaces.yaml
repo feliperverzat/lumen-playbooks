@@ -1,7 +1,0 @@
----
-- name: List information of all network interfaces available at the host
-  hosts: all
-  gather_facts: true
-
-  roles:
-    - list-network-interfaces

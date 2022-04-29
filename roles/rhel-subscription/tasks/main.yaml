@@ -1,7 +1,0 @@
----
-- name: Registering a and auto-subscribing system
-  redhat_subscription:
-    state: present
-    username: "{{ subscription_user }}"
-    password: "{{ subscription_password }}"
-    auto_attach: true

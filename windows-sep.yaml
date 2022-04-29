@@ -1,7 +1,0 @@
----
-- name: Windows Set Agent Installation
-  hosts: win
-  become: false
-  gather_facts: true
-  roles:
-    - windows-sep
