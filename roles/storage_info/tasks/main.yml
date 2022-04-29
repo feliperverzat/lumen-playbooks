@@ -5,8 +5,8 @@
           - "{{ subset }}"
         fa_url: 10.220.14.5
         api_token: 2475f960-2a79-21d0-5994-ef374bde6689
-    headers:
-      Content-Type: application/json    
+        headers:
+          Content-Type: application/json    
     register: array_info
     
   - name: retrieve info
