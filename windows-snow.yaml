@@ -1,0 +1,7 @@
+---
+- name: Windows SNOW Agent Installation
+  hosts: win
+  become: false
+  gather_facts: true
+  roles:
+    - windows-snow

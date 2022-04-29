@@ -1,0 +1,7 @@
+---
+- name: Windows Patch-Manager Agent Installation
+  hosts: win
+  become: false
+  gather_facts: true
+  roles:
+    - windows-patchmanager

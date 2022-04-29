@@ -1,0 +1,9 @@
+---
+- name: HPE Bare-metal Power Operations
+  hosts: 127.0.0.1
+  gather_facts: false
+  vars:
+    lock_dir: "/tmp/ansible-playbook-hpe-bm-power-{{  ilo_ip  }}.lock"
+
+  roles:
+    - hpe-bm-power

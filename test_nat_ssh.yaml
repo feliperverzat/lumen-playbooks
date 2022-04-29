@@ -1,0 +1,10 @@
+---
+  - name: Create NAT SSH rule for IP
+    hosts: all
+    connection: local
+    gather_facts: false
+    collections:
+      - paloaltonetworks.panos
+    roles:
+      - test_nat_ssh
+...

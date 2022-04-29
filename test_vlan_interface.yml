@@ -1,0 +1,10 @@
+---
+  - name: Configure VLAN interfaces
+    hosts: all
+    connection: local
+    gather_facts: false
+    collections:
+      - paloaltonetworks.panos
+    roles:
+      - test_vlan_interface
+...

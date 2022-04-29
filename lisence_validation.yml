@@ -1,0 +1,8 @@
+---
+- name: Checando licença de todos os servidores rhel.
+  hosts: all
+  become: yes
+  gather_facts: false
+  roles:
+    - license_validation
+...

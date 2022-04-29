@@ -1,0 +1,10 @@
+---
+  - name: Creating security rules
+    hosts: all
+    connection: local
+    gather_facts: false
+    collections:
+      - paloaltonetworks.panos
+    roles:
+      - test_security_rules
+...

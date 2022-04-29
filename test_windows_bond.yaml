@@ -1,0 +1,14 @@
+---
+- name: Create a VPC on Windows Server
+  hosts: all
+  gather_facts: false
+  vars:
+    ansible_connection: winrm
+    ansible_winrm_server_cert_validation: ignore
+    ansible_port: 5985
+    ansible_winrm_scheme: http
+    ansible_winrm_transport: ntlm
+
+  roles:
+    - windows_bond
+...

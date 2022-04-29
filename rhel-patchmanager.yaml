@@ -1,0 +1,24 @@
+---
+- name: RHEL PatchManager Installation
+  hosts: all
+  gather_facts: true
+  vars:
+    lock_dir: "/tmp/ansible-playbook-rhel-patchmanager-{{  inventory_hostname  }}.lock"
+    state_timeout: 300
+    uniqueid: 0
+
+  pre_tasks:
+    - name: wait for lock
+      include_tasks: wait_for_lock.yaml
+      vars:
+        wait_for_lock_dir: "{{ lock_dir }}"
+
+  roles:
+    - rhel-patchmanager
+
+  post_tasks:
+    - name: clear lock
+      file:
+        path: "{{ lock_dir }}"
+        state: absent
+      become: yes

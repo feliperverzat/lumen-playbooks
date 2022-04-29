@@ -1,0 +1,10 @@
+---
+  - name: Configure a Virtual Router
+    hosts: all
+    connection: local
+    gather_facts: false
+    collections:
+      - paloaltonetworks.panos
+    roles:
+      - fwpa-vr
+...

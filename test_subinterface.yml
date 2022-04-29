@@ -1,0 +1,10 @@
+---
+  - name: Creating a subinterface on interface group.
+    hosts: all
+    connection: local
+    gather_facts: false
+    collections:
+      - paloaltonetworks.panos
+    roles:
+      - test_subinterface
+...

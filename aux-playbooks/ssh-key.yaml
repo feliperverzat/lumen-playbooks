@@ -1,0 +1,12 @@
+- name: Public key is deployed to managed hosts for Ansible
+  hosts: linux
+  tasks:
+    - name: Troca de chave ssh para o usuario rh_user ~/.ssh/authorized_hosts
+      authorized_key:
+        user: rh_user
+        state: present
+        key: '{{ item }}'
+      with_file:
+        - /home/rh_user/.ssh/id_rsa.pub
+
+# Obs: para o a playbook funcionar incluir a opcao --ask-pass na chamada do comando.

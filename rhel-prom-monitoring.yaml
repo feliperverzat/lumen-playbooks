@@ -1,0 +1,23 @@
+---
+- name: RHEL Prometheus Node Exporter Installation
+  hosts: all
+  serial: 1
+  gather_facts: true
+  vars:
+    lock_dir: "/tmp/ansible-playbook-rhel-prom-monitoring-{{  inventory_hostname  }}.lock"
+
+  pre_tasks:
+    - name: wait for lock
+      include_tasks: wait_for_lock.yaml
+      vars:
+        wait_for_lock_dir: "{{ lock_dir }}"
+
+  roles:
+    - rhel-prom-monitoring
+
+  post_tasks:
+    - name: clear lock
+      file:
+        path: "{{ lock_dir }}"
+        state: absent
+      become: yes

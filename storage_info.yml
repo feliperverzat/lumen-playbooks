@@ -1,0 +1,8 @@
+---
+  - name: Collect information about PureStorage
+    hosts: all
+    connection: local
+    gather_facts: false
+    roles:
+      - storage_info
+...

@@ -1,0 +1,7 @@
+---
+- name: Linux Bond interfaces
+  hosts: all
+  gather_facts: false
+  roles:
+    - linux_bond
+...

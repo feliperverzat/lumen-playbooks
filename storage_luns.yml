@@ -1,0 +1,8 @@
+---
+  - name: Create LUNS on Storage
+    hosts: all
+    connection: local
+    gather_facts: false
+    roles:
+      - storage_luns
+...

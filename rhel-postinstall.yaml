@@ -1,0 +1,10 @@
+---
+- name: RHEL Post-install
+  hosts: rhel
+  gather_facts: true
+  become: true
+  roles:
+    - rhel-subscription
+    - rhel-patchmanager
+    - rhel-monitoring
+    - rhel-backup
