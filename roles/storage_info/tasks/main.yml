@@ -16,8 +16,8 @@
     debug:
       msg: "É diferente isso"
     when:
-    - wwn1 is not in item == 1
-    with_items: "{{ info_hosts_list }}"
+    - wwn1 is not in info_hosts_list
+#    with_items: "{{ info_hosts_list }}"
     run_once: true
     
 #when: {{ wwn1 }} and {{ wwn2 }} != {{ item }}"  
