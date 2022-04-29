@@ -17,6 +17,7 @@
       msg: "É diferente isso"
     when:
     - item is search wwn1 != 1
+    - item is search wwn2 != 1
     with_items: "{{ info_hosts_list }}"
 #when: {{ wwn1 }} and {{ wwn2 }} != {{ item }}"  
       
