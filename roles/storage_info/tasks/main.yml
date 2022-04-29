@@ -8,12 +8,12 @@
     register: array_info
   - name: retrieve info
     set_fact:
-      info_hosts: "{{ array_info.json [ json_query(query) ] }}"
+      info_hosts: "{{ array_info [ json_query('purefa_info.hosts.*.wwn') ] }}"
       vars:
         query: "purefa_info.hosts"
   - name: show configuration information
     debug: 
-      msg: "{{ item.info_hosts }}"
+      msg: "{{ info_hosts }}"
 
 
 #'purefa_info.hosts.*.wwn'
