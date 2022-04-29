@@ -14,11 +14,9 @@
       info_hosts_list: "{{ info_hosts.split(' ') }}"
   - name: Output
     debug:
-    run_once: true
       msg: "É diferente isso"
     when:
-    - wwn1 is search item != 1
-    - wwn2 is search item != 1
+    - wwn1 is match item != 1
     with_items: "{{ info_hosts_list }}"
     
 #when: {{ wwn1 }} and {{ wwn2 }} != {{ item }}"  
