@@ -8,4 +8,4 @@
     register: array_info
   - name: show configuration information
     debug: 
-      msg: array_info
+      msg: "{{ array_info }}"
