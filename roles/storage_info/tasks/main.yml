@@ -16,7 +16,7 @@
     debug:
       msg: "É diferente isso"
     when:
-    - wwn1 is match item != -1
+    - wwn1 is match item = -1
     with_items: "{{ info_hosts_list }}"
     
 #when: {{ wwn1 }} and {{ wwn2 }} != {{ item }}"  
