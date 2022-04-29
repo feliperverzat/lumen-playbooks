@@ -7,4 +7,5 @@
         api_token: 2475f960-2a79-21d0-5994-ef374bde6689
     register: array_info
   - name: show configuration information
-    debug: msg - array_info
+    debug: 
+      msg: array_info
