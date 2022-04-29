@@ -14,8 +14,8 @@
       info_hosts_list: "{{ info_hosts.split(' ') }}"
   - name: Output
     debug:
-      msg: This is your "{{ item.info_hosts_list }}"
-      witch_items: "{{ info_hosts_list }}"
+      var: info_hosts_list
+      
       
       
 #'purefa_info.hosts.*.wwn'
