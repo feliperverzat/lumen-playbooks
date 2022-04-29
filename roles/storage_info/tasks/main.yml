@@ -8,7 +8,9 @@
     register: array_info
   - name: retrieve info
     set_fact:
-      info_hosts: "{{ array_info | json_query('purefa_info.hosts.*.wwn') | regex_replace('[^A-Z 0-9]', '') }}"
+      info_hosts: "{{ array_info | json_query(query) }}"
+    vars:
+      query: 'purefa_info.hosts[*].wwn[*]'
   - name: show configuration information
     set_fact: 
       info_hosts_list: "{{ info_hosts.split(' ') }}"
