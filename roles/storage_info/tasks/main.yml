@@ -14,7 +14,8 @@
       info_hosts_list: "{{ info_hosts.split(' ') }}"
   - name: Output
     debug:
-      var: info_hosts_list
+      msg: "{{ info_hosts_list }} "
+     
       
       
       
