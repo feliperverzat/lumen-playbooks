@@ -9,8 +9,6 @@
   - name: retrieve info
     set_fact:
       info_hosts: "{{ array_info ['purefa_info.hosts.*.wwn'] }}"
-      vars:
-        query: "purefa_info.hosts.*.wwn"
   - name: show configuration information
     debug: 
       msg: "{{ info_hosts }}"
