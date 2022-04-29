@@ -1,6 +1,0 @@
----
-collections:
-- paloaltonetworks.panos
-- cisco.aci
-- ansible.windows
-- fortinet.fortios
