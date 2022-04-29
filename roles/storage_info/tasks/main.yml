@@ -16,7 +16,8 @@
     debug:
       msg: "É diferente isso"
     when:
-    - wwn1 is not in info_hosts_list or wwn2 is not in info_hosts_list
+    - wwn1 is not in info_hosts_list
+    - wwn2 is not in info_hosts_list
 #    with_items: "{{ info_hosts_list }}"
 
     
