@@ -12,9 +12,9 @@
   
   - set_fact:
       array_info_list: "{{ array_info_list + [  item | json_query(query) ] }}"
-    #with_items: "{{ array_info.results }}"
+    with_items: "{{ array_info.results }}"
     vars:
-      query: '"hosts[*]"."wwn[*]"'
+      query: '"hosts"."wwn"'
   - name: show all information
     debug:
       msg: "{{ array_info_list }}"
