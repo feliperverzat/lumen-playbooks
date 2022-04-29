@@ -11,4 +11,4 @@
       info_hosts: "{{ array_info | json_query('purefa_info.hosts.*.wwn') }}"    
   - name: show configuration information
     debug: 
-      var: info_hosts
+      msg: "{{ item info_hosts }}"
