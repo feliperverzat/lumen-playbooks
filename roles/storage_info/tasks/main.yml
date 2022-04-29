@@ -11,7 +11,7 @@
       msg: "{{ array_info['purefa_info'] }}"
   
   - set_fact:
-      array_info_list: "{{ array_info_list + [  item | json_query(query) ] }}"
+      array_info_list: "{{ array_info['purefa_info'] }}"
     with_items: "{{ array_info.results }}"
     vars:
       query: '"hosts"."wwn"'
