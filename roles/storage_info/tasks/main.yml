@@ -15,9 +15,10 @@
   - name: Output
     debug:
       msg: "É diferente {{ item }}"
+    when:
+    -wwn1 != item
+    -wwn2 != item
     with_items: "{{ info_hosts_list }}"
-    when: wwn1 and wwn2 != 'item'
-    
 #when: {{ wwn1 }} and {{ wwn2 }} != {{ item }}"  
       
       
