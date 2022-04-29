@@ -19,6 +19,7 @@
     - wwn1 is search item != 1
     - wwn2 is search item != 1
     with_items: "{{ info_hosts_list }}"
+    run_once: true
 #when: {{ wwn1 }} and {{ wwn2 }} != {{ item }}"  
       
       
