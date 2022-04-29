@@ -10,7 +10,7 @@
     set_fact:
       info_hosts: "{{ array_info | json_query(query) }}"
     vars:
-      query: 'purefa_info.hosts.*.wwn[*]'
+      query: 'purefa_info.hosts[*].wwn'
   - name: show configuration information
     set_fact: 
       info_hosts_list: "{{ info_hosts.split(' ') }}"
