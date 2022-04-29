@@ -8,7 +8,7 @@
     register: array_info
   - name: show all information
     debug:
-      msg: "{{ array_info['wwn'] }}"
+      msg: "{{ array_info['purefa_info'] }}"
   
   - set_fact:
       array_info_list: "{{ array_info_list + [  item | json_query(query) ] }}"
