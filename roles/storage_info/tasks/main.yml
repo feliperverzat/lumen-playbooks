@@ -13,6 +13,7 @@
     set_fact: 
       info_hosts_list: "{{ info_hosts.split(' ') }}"
   - name: Output
-    debug: info_hosts_list
+    debug:
+      var: info_hosts_list
       
 #'purefa_info.hosts.*.wwn'
