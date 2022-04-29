@@ -14,7 +14,7 @@
       info_hosts_list: "{{ info_hosts.split(' ') }}"
   - name: Output
     debug:
-      msg: "É diferente {{ item }}"
+      msg: "É diferente isso"
     when:
     - wwn1 != item
     - wwn2 != item
