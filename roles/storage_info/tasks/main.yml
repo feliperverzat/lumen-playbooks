@@ -8,5 +8,5 @@
     register: array_info
   - name: show configuration information
     debug:
-      msg: "{{ array_info['purefa_info']['hosts'*]['wwn'] }}"
+      msg: "{{ array_info['purefa_info']['hosts[*]']['wwn'] }}"
 ...
