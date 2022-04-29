@@ -19,7 +19,7 @@
     register: array_info
 
   - set_fact:
-       array_info_list: "{{ array_info.json | json_query(query) }}"
+       array_info_list: "{{ array_info | json_query(query) }}"
      vars:
        query: 'hosts[*].wwn[*]'
   - name: show all information
