@@ -1,0 +1,191 @@
+---
+- name: Check Health status via API
+  block:
+    - name: Get general status body
+      uri:
+        url: https://{{ ilo_ip }}/redfish/v1/Systems/1
+        method: GET
+        headers:
+          Content-Type: application/json
+        validate_certs: no
+        user: "{{ ilo_user }}"
+        password: "{{ ilo_password }}"
+        force_basic_auth: yes
+      register: status_body
+
+    - name: Retrieve health status
+      set_fact:
+        health_status: "{{ status_body.json | json_query('Status.Health') }}"
+
+    - name: Fail if status is different from OK
+      fail:
+        msg: "[FAILURE] Server is unhealthy."
+      when: health_status != "OK"
+  rescue:
+    - name: Printing status body
+      debug:
+        var: health_status
+
+    - name: Server is unhealthy
+      fail:
+        msg: "[ERROR] [E0001] Server is unhealthy. Please check if the server is correctly powered and configured to accept further actions."
+      when: health_status == "OK"
+  delegate_to: 127.0.0.1
+  tags:
+    - health
+
+- name: Configure BIOS options
+  block:
+    - name: Retrieve list of ethernet interfaces
+      uri:
+        url: https://{{ ilo_ip }}/redfish/v1/Systems/1/EthernetInterfaces/
+        method: GET
+        headers:
+          Content-Type: application/json
+        validate_certs: no
+        user: "{{ ilo_user }}"
+        password: "{{ ilo_password }}"
+        force_basic_auth: yes
+      register: ethernet_interfaces
+      delegate_to: 127.0.0.1
+
+    - set_fact:
+        ethernet_interfaces_list: "{{ ethernet_interfaces.json | json_query(query) }}"
+      vars:
+        query: 'Members[*]."@odata.id"'
+
+    - name: Retrieve information about each ethernet interface
+      uri:
+        url: https://{{ ilo_ip }}{{ item }}
+        method: GET
+        headers:
+          Content-Type: application/json
+        validate_certs: no
+        user: "{{ ilo_user }}"
+        password: "{{ ilo_password }}"
+        force_basic_auth: yes
+      with_items: "{{ ethernet_interfaces_list }}"
+      register: mac_addresses
+      delegate_to: 127.0.0.1
+
+    - set_fact:
+        mac_addresses_list: []
+
+    - set_fact:
+        mac_addresses_list: "{{ mac_addresses_list + [  item | json_query(query) ] }}"
+      with_items: "{{ mac_addresses.results }}"
+      when: linkup in "{{ item | json_query(linkquery) }}"
+      vars:
+        query: '"json"."MACAddress"'
+        linkquery: '"json"."LinkStatus"'
+        linkup: "LinkUp"
+
+    - name: Create PXE unique symlink pointing to valid MAC Addresses
+      shell: "ln -sf {{ operating_system }}-{{ operating_system_type }}.ipxe mac-{{ item | replace(':', '') }}.ipxe"
+      with_items: "{{ mac_addresses_list }}"
+      args:
+        chdir:  /var/lib/tftpboot/pxe/ipxe
+      become: yes
+
+    - name: Set BootMode to Uefi
+      redfish_config:
+        category: Systems
+        command: SetBiosAttributes
+        bios_attribute_name: "BootMode"
+        bios_attribute_value: "Uefi"
+        baseuri: "{{ ilo_ip }}"
+        username: "{{ ilo_user }}"
+        password: "{{ ilo_password }}"
+      register: bios_attribute
+      delegate_to: 127.0.0.1
+
+    - name: Set BootOrder using ilorest
+      shell: |
+        ilorest --nologo --notoolbar login {{ ilo_ip }} -u {{ ilo_user }} -p {{ ilo_password }}
+        ilorest --nologo --notoolbar bootorder $(ilorest --nologo --notoolbar bootorder | sed -n '/^Current Persistent Boot Order/,/^Continuous and one/{p;/^Continuous and one/q}' | sed '1d;$d' | grep -E "EmbRAID.*Bay:1" | cut -d'.' -f1 | awk '{printf("%s''%s''",NR==1?"":OFS,$1)}END{print ""}' OFS=',' | awk '{print "["$0"]"}') --commit
+        ilorest --nologo --notoolbar bootorder $(ilorest --nologo --notoolbar bootorder | sed -n '/^Current Persistent Boot Order/,/^Continuous and one/{p;/^Continuous and one/q}' | sed '1d;$d' | grep -E "NIC.*10Gb.*PXE.*IPv4" | cut -d'.' -f1 | awk '{printf("%s''%s''",NR==1?"":OFS,$1)}END{print ""}' OFS=',' | awk '{print "["$0"]"}') --commit
+      register: bootorder_output
+      delegate_to: 127.0.0.1
+
+    - name: Set one-time boot device to {{ bootdevice }}
+      redfish_command:
+        category: Systems
+        command: SetOneTimeBoot
+        bootdevice: "{{ bootdevice }}"
+        baseuri: "{{ ilo_ip }}"
+        username: "{{ ilo_user }}"
+        password: "{{ ilo_password }}"
+      register: bios_onetimeboot
+      delegate_to: 127.0.0.1
+  rescue:
+    - name: BIOS configuration failed
+      fail:
+        msg: "[ERROR] [E0004] BIOS preparation steps failed. Please check if the server is in a compatible state to start provisioning and retry."
+      when: health_status == "OK"
+  tags:
+    - bios
+
+- name: Reboot system using API
+  block:
+     - name: Reboot system
+       redfish_command:
+         category: Systems
+         command: PowerReboot
+         baseuri: "{{ ilo_ip }}"
+         username: "{{ ilo_user }}"
+         password: "{{ ilo_password }}"
+       delegate_to: 127.0.0.1
+       register: reboot_status
+  rescue:
+    - name: Printing status body
+      debug:
+        var: reboot_status
+
+    - name: Reboot failure
+      fail:
+        msg: "[ERROR] [E0002] Ansible was not able to reboot the system through the API. Please check if the server is in a compatible state to accept reboot commands."
+      when: health_status == "OK"
+  delegate_to: 127.0.0.1
+  tags:
+    - reboot
+
+- name: Pause Ansible until server is rebooted and the installation process starts
+  pause:
+    minutes: 5
+
+- name: Wait until connection to the system is available
+  block:
+     - name: Wait for SSH Port 22 to be available
+       wait_for:
+         host: "{{ service_ip }}"
+         port: 22
+         delay: 30
+         search_regex: OpenSSH
+         timeout: 1800
+       delegate_to: 127.0.0.1
+       when: operating_system is search('rhel')
+     - name: Wait for RDP Port 3389 to be available
+       wait_for:
+         host: "{{ service_ip }}"
+         port: 3389
+         delay: 30
+         timeout: 1000
+       delegate_to: 127.0.0.1
+       when: operating_system is search('win')
+  rescue:
+    - name: Connection to the server is not available
+      fail:
+        msg: "[ERROR] [E0003] Remote connection to the server was not available until the maximum time limit of 1800 seconds. Please check if the operating system installation finished successfully and/or the SSH/RFP services are up and running."
+      when: health_status == "OK"
+  delegate_to: 127.0.0.1
+  tags:
+    - wait
+
+- name: Clean symlinks from PXE folder
+  shell: "unlink mac-{{ item | replace(':', '') }}.ipxe"
+  with_items: "{{ mac_addresses_list }}"
+  args:
+    chdir:  /var/lib/tftpboot/pxe/ipxe
+  become: yes
+  tags:
+    - end

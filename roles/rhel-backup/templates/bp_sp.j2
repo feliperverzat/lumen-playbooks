@@ -1,0 +1,5 @@
+{% for media in MEDIASERVER_SP %}
+SERVER = {{ media }}
+{% endfor %}
+CLIENT_NAME = {{ ansible_hostname }}
+CONNECT_OPTIONS = localhost 1 0 2

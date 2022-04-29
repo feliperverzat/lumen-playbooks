@@ -1,0 +1,9 @@
+---
+- name: Padronizando dados
+  set_fact:
+    TENANT: "tn-{{ CLIENTE | lower }}"
+    VRF: "vrf-{{ CLIENTE | lower }}"
+    BD: "bd-{{ CLIENTE | lower }}"
+    EPG: "epg-{{ CLIENTE | lower }}"
+    L3OUT: "l3out-{{ CLIENTE | lower }}"
+    L3_DOMAIN: "l3out_domain-{{ CLIENTE | lower }}"

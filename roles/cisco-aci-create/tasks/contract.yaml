@@ -1,0 +1,97 @@
+---
+- name: Criando Contract Global Any
+  aci_contract:
+    hostname: "{{ inventory_hostname }}"
+    username: "{{ lookup('env','APIC_USER')}}"
+    password: "{{ lookup('env','APIC_PASS')}}"
+    tenant: "{{ TENANT }}-{{ VLAN }}"
+    contract: "cn-{{ CLIENTE | lower }}-permit-any"
+    description: Contract communication in Tenant
+    scope: tenant
+    state: present
+    validate_certs: no
+  register: create_contract_output
+
+- debug:
+    msg: "{{ create_contract_output }}"
+  when: create_contract_output.changed == true and create_contract_output.failed == false
+
+- name: Criando novo filter para tenant
+  aci_filter:
+    hostname: "{{ inventory_hostname }}"
+    username: "{{ lookup('env','APIC_USER')}}"
+    password: "{{ lookup('env','APIC_PASS')}}"
+    tenant: "{{ TENANT }}-{{ VLAN }}"
+    filter: "filter-{{ CLIENTE | lower }}-permit-any"
+    description: Filter Permit Any
+    state: present
+    validate_certs: no
+  register: create_filter_output
+
+- name: Adicionando regra para o filter
+  aci_filter_entry:
+    hostname: "{{ inventory_hostname }}"
+    username: "{{ lookup('env','APIC_USER')}}"
+    password: "{{ lookup('env','APIC_PASS')}}"
+    tenant: "{{ TENANT }}-{{ VLAN }}"
+    entry_name: any
+    ether_type: unspecified
+    filter: "filter-{{ CLIENTE | lower }}-permit-any"
+    description: Entry Permit Any
+    state: present
+    validate_certs: no
+  register: create_filterentry_output
+
+- name: Criando um subject de Contract
+  aci_contract_subject:
+    hostname: "{{ inventory_hostname }}"
+    username: "{{ lookup('env','APIC_USER')}}"
+    password: "{{ lookup('env','APIC_PASS')}}"
+    tenant: "{{ TENANT }}-{{ VLAN }}"
+    contract: "cn-{{ CLIENTE | lower }}-permit-any"
+    subject: "sbj-{{ CLIENTE | lower }}"
+    description: Subject Permit Any
+    reverse_filter: yes
+    priority: level1
+    dscp: unspecified
+    state: present
+    validate_certs: no
+  register: create_subject_output
+
+- debug:
+    msg: "{{ create_subject_output }}"
+  when: create_subject_output.changed == true and create_subject_output.failed == false
+
+- name: Add a new contract subject to filer binding
+  aci_contract_subject_to_filter:
+    hostname: "{{ inventory_hostname }}"
+    username: "{{ lookup('env','APIC_USER')}}"
+    password: "{{ lookup('env','APIC_PASS')}}"
+    tenant: "{{ TENANT }}-{{ VLAN }}"
+    contract: "cn-{{ CLIENTE | lower }}-permit-any"
+    subject: "sbj-{{ CLIENTE | lower }}"
+    filter: "filter-{{ CLIENTE | lower }}-permit-any"
+    state: present
+    validate_certs: no
+  register: create_subjectfilter_output
+
+- debug:
+    msg: "{{ create_subjectfilter_output }}"
+  when: create_subjectfilter_output.changed == true and create_subjectfilter_output.failed == false
+
+- name: Add a new contract to EPG binding
+  aci_epg_to_contract:
+    hostname: "{{ inventory_hostname }}"
+    username: "{{ lookup('env','APIC_USER')}}"
+    password: "{{ lookup('env','APIC_PASS')}}"
+    tenant: "{{ TENANT }}-{{ VLAN }}"
+    ap: "app-{{ CLIENTE | lower }}"
+    epg: "{{ EPG }}-{{ item.0 }}-{{ VLAN }}"
+    contract: "cn-{{ CLIENTE | lower }}-permit-any"
+    contract_type: "{{ item.1 }}"
+    state: present
+    validate_certs: no
+  with_nested:
+    - "{{ ENV }}"
+    - ['provider','consumer']
+  register: create_epgtocontract_output

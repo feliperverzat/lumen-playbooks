@@ -1,0 +1,146 @@
+---
+- name: Prepare for backup installation
+  block:
+    - name: Create local temporary directory for this execution
+      tempfile:
+        state: directory
+        suffix: "{{ backup_filename }}"
+      register: tempfolder    
+      delegate_to: 127.0.0.1
+
+    - name: Downloading binaries from central repository
+      get_url:
+        url: "{{ item.url }}"
+        dest: "{{ tempfolder.path }}"
+        mode: '0755'
+        checksum: "{{ item.checksum }}"
+      loop:
+        - { url: 'http://{{ file_server }}/archive/rhel/{{ backup_filename }}/latest/{{ backup_libnsl_filename }}', checksum: 'sha256:http://{{ file_server }}/archive/rhel/{{ backup_filename }}/latest/{{ backup_libnsl_filename }}.sha256.txt' }
+        - { url: 'http://{{ file_server }}/archive/rhel/{{ backup_filename }}/latest/{{ backup_openv_filename }}', checksum: 'sha256:http://{{ file_server }}/archive/rhel/{{ backup_filename }}/latest/{{ backup_openv_filename }}.sha256.txt' }
+        - { url: 'http://{{ file_server }}/archive/rhel/{{ backup_filename }}/latest/{{ backup_vrtspbx_filename }}', checksum: 'sha256:http://{{ file_server }}/archive/rhel/{{ backup_filename }}/latest/{{ backup_vrtspbx_filename }}.sha256.txt' }
+        - { url: 'http://{{ file_server }}/archive/rhel/{{ backup_filename }}/latest/{{ backup_vx_filename }}', checksum: 'sha256:http://{{ file_server }}/archive/rhel/{{ backup_filename }}/latest/{{ backup_vx_filename }}.sha256.txt' }
+      delegate_to: 127.0.0.1
+  rescue:
+    - name: Failed to create local temporary directory and retrieve binaries
+      fail:
+        msg: "[ERROR] [E0100] Failure while creating temporary directory and retrieving binaries from central repository. Please check if the central repository URL is accessible and there is enough space on Ansible Tower node filesystem."
+
+- name: Prepare remote server for backup installation
+  block:
+    - name: Updating /etc/hosts
+      blockinfile:
+        block: "{{ lookup('file', item.FILE) }}"
+        path: /etc/hosts
+      loop: "{{ HOSTS | list }}" 
+      become: yes
+      when: item.REGION == REGION
+
+    - name: Unarchiving artifacts to the correct location
+      unarchive:
+        src: "{{ tempfolder.path }}/{{ item.file }}"
+        dest: "{{ item.path }}/"
+        mode: '0755'
+      with_items:
+        - { file: '{{ backup_libnsl_filename }}', path: '/usr/lib64/' }
+        - { file: '{{ backup_openv_filename }}', path: '/usr' }
+        - { file: '{{ backup_vrtspbx_filename }}', path: '/opt' }
+        - { file: '{{ backup_vx_filename }}', path: '/etc' }
+      become: yes
+  rescue:
+    - name: Failed to prepare the remote server for backup installation
+      fail:
+        msg: "[ERROR] [E0105] Failure while preparing remote server for utility installation. Please check connection to remote server and if the remote server is able to proceed."
+
+- name: Backup utility installation
+  block:
+    - name: Applying template bp.conf
+      template:
+        src: bp_{{ REGION | lower }}.j2
+        dest: /usr/openv/netbackup/bp.conf
+      become: yes
+
+    - name: Starting vxpbx_exchanged
+      command:
+        argv:
+          - ./vxpbx_exchanged
+          - start
+      become: yes
+      become_user: root
+      args:
+        chdir: /opt/VRTSpbx/bin
+      register: start_vxpbx
+
+    - debug:
+        msg: "{{ start_vxpbx.stdout }}"
+
+    - name: Starting netbackup
+      command:
+        argv:
+          - ./netbackup
+          - start
+      become: yes
+      become_user: root
+      args:
+        chdir: /usr/openv/netbackup/bin/goodies
+      register: start_netbackup
+
+    - debug:
+        msg: "{{ start_netbackup.stdout_lines }}"
+
+    - name: Generating new ca certificate
+      command:
+        argv:
+          - ./nbcertcmd
+          - -getcacertificate
+      become: yes
+      become_user: root
+      args:
+        chdir: /usr/openv/netbackup/bin
+      register: start_cacert
+
+    - debug:
+        msg: "{{ start_cacert.stdout_lines }}"
+
+    - name: Generating new certificate
+      command:
+        argv:
+          - ./nbcertcmd
+          - -getcertificate
+      become: yes
+      become_user: root
+      args:
+        chdir: /usr/openv/netbackup/bin
+      register: start_cert
+
+    - debug:
+        msg: "{{ start_cert.stdout_lines }}"
+
+    - name: Execute command validation
+      command:
+        argv:
+          - ./bpclntcmd
+          - -pn
+          - -verbose  
+      become: yes
+      become_user: root
+      args:
+        chdir: /usr/openv/netbackup/bin
+      register: check_install
+  rescue:
+    - name: Error during installation
+      fail:
+        msg: "[ERROR] [E0101] Failure to install the utility. Please check if the connection to the remote server, if there is enough space on filesystem or even permissions to folders are properly configured. Otherwise it should be a problem while starting the service."
+
+- name: Cleanup temporary files
+  block:
+    - name: Cleanup local temporary directory
+      file:
+        path: "{{ tempfolder.path }}"
+        state: absent
+      delegate_to: 127.0.0.1
+
+  rescue:
+    - name: Failure while executing local temporary folder cleanup
+      fail:
+        msg: "[ERROR] [E0102] Failure while cleaning the temporary folder located at Ansible Tower node. Please check the {{ tempfolder.path }} and/or {{ remote_tempfolder.path }} folder for any residual folders to avoid running out of filesystem space."
+        

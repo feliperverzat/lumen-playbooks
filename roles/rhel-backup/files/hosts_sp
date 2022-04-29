@@ -1,0 +1,9 @@
+##### NETBACKUP - Ambiente Novo Sao Paulo ####
+189.125.185.85			virtnbusp01.globaldc.local		virtnbusp01
+189.125.185.124			appnbusp07.level3dc.br			appnbusp07
+189.125.185.117			appnbusp03.level3dc.br			appnbusp03
+10.220.107.16			appnbusp07-acs.level3dc.br		appnbusp07-acs
+189.125.185.102			appnbusp08.level3dc.br          	appnbusp08
+189.125.185.80			nbmasterbra01		 		nbmasterbra01.smpdc.gblx
+189.125.185.81			appnbusp09.level3dc.br          	appnbusp09
+189.125.185.82			appnbusp10.level3dc.br          	appnbusp10

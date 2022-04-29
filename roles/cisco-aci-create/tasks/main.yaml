@@ -1,0 +1,28 @@
+---
+- name: PADRONIZANDO DADOS
+  include_tasks: padronizando_vars.yaml
+
+- name: TENANT 
+  include_tasks: tenant.yaml
+
+- name: VRF 
+  include_tasks: vrf.yaml
+
+- name: BRIDGE DOMAIN
+  include_tasks: bd.yaml
+
+- name: APPLICATION PROFILE
+  include_tasks: ap.yaml
+  
+#- name: CREATING L3OUT
+#  include_tasks: l3out.yaml
+
+- name: EPG 
+  include_tasks: epg.yaml
+
+- name: CONTRACT
+  include_tasks: contract.yaml
+
+- name: SUBNET
+  include_tasks: subnet.yaml
+

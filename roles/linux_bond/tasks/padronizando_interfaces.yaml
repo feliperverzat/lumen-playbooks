@@ -1,0 +1,27 @@
+--- 
+- name: Definindo primeira interface
+  shell: "ip addr show |grep state\\ UP |sed -n '2p' |awk '{print $2}' |sed 's/://' "
+  #|sed -n '2,3p' |awk '{print $2}' |sed 's/://'"
+  register: if1_name
+  
+- name: Debug
+  debug:
+    var: if1_name.stdout
+    
+- name: definindo variavel
+  set_fact:
+    if1_name: "{{ if1_name.stdout }}"
+    
+- name: Definindo segunda interface
+  shell: "ip addr show |grep state\\ UP |sed -n '3p' |awk '{print $2}' |sed 's/://' "
+  #|sed -n '2,3p' |awk '{print $2}' |sed 's/://'"
+  register: if2_name
+  
+- name: Debug
+  debug:
+    var: if2_name.stdout
+    
+- name: definindo variavel
+  set_fact:
+    if2_name: "{{ if2_name.stdout }}"
+...

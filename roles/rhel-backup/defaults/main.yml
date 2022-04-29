@@ -1,0 +1,46 @@
+---
+backup_filename: backup
+file_server: 10.228.1.30
+backup_libnsl_filename: netbackup_libnsl.tar.gz
+backup_openv_filename: netbackup_openv.tar.gz
+backup_vrtspbx_filename: netbackup_vrtspbx.tar.gz
+backup_vx_filename: netbackup_vx.tar.gz
+state_timeout: 300 # seconds
+uniqueid: 0
+
+REGION: SP #teste
+
+HOSTS:
+  - REGION: SP
+    FILE: hosts_sp
+  - REGION: RJ
+    FILE: hosts_rj
+  - REGION: CTB
+    FILE: hosts_ctb
+
+MEDIASERVER_SP:
+  - nbmasterbra01
+  - appnbusp03.level3dc.br
+  - appnbusp07.level3dc.br
+  - appnbusp08.level3dc.br
+  - appnbusp03
+  - appnbusp07
+  - appnbusp08
+  - srvnbacsp01
+  - appnbusp09
+  - appnbusp10
+
+MEDIASERVER_RJ:
+  - nbmasterbrarj01
+  - clunburj01.level3dc.br
+  - clunburj02.level3dc.br
+  - appnburj01.level3dc.br
+  - appnburj02.level3dc.br
+  - appnburj01
+  - appnburj03
+  - CTA-SG-NBMEDIA01
+
+MEDIASERVER_CTB:
+  - sinnbupr01
+  - appnbupr01
+  - appnbupr02

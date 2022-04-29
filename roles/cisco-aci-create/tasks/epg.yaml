@@ -1,0 +1,16 @@
+---
+- name: Criando EPG
+  aci_epg:
+    hostname: "{{ inventory_hostname }}"
+    username: "{{ lookup('env','APIC_USER')}}"
+    password: "{{ lookup('env','APIC_PASS')}}"
+    tenant: "{{ TENANT }}-{{ VLAN }}"
+    ap: "app-{{ CLIENTE | lower }}"
+    epg: "{{ EPG }}-{{ item }}-{{ VLAN }}"
+    description: Web Intranet EPG
+    bd: "{{ BD }}-{{ item }}-{{ VLAN }}"
+    preferred_group: yes
+    state: present
+    validate_certs: no
+  loop: "{{ ENV }}"
+  register: create_epg_output

@@ -1,0 +1,14 @@
+---
+- name: Verificando qual o fabricante do baremetal
+  fail: 
+    msg: "[ERROR] One or more required variables are not defined. Please check the parameter definition before trying again."
+  when: "{{ item }} is not defined"
+  with_items:
+    - vendor
+
+- include_tasks: hpe_bond.yaml
+  when: vendor == "hpe"
+
+- include_tasks: dell_bond.yaml
+  when: vendor == "dell"
+...

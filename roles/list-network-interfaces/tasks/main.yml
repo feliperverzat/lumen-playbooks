@@ -1,0 +1,26 @@
+---
+- name: Get all network interfaces available
+  set_fact:
+    network_interfaces_name_list: "{{ ansible_facts['interfaces'] }}"
+  no_log: true
+
+- name: Initialize info list
+  set_fact:
+    network_interfaces_info_list: []
+  no_log: true
+
+- name: Populate info list
+  set_fact:
+    network_interfaces_info_list: "{{ network_interfaces_info_list + [ ansible_facts[ item | replace('-','_') ] ] }}"
+  with_items: "{{ network_interfaces_name_list }}"
+  no_log: true
+
+- name: Relate network interface name with info list
+  set_fact:
+    network_interfaces: "{{ network_interfaces | default([]) + [dict(interface=item[0], details=item[1])] }}"
+  loop: "{{ network_interfaces_name_list | zip(network_interfaces_info_list) | list }}"
+  no_log: true
+
+- name: List information about all interfaces currently available at the host
+  debug:
+    var: network_interfaces

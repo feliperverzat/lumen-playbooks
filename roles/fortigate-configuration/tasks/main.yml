@@ -1,0 +1,98 @@
+---
+- name: Criando VDOM
+  fortios_system_vdom:
+    host: "{{ fortigate_host }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    https: "True"
+    ssl_verify: "False"
+    vdom: root
+    state: present
+    system_vdom:
+      name: "{{ vdom }}"
+      short_name: "{{ vdom }}"
+
+- name: Configure VLANS
+  fortios_system_interface:
+    host: "{{ fortigate_host }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    vdom: "root"
+    https: "True"
+    ssl_verify: "False"
+    system_interface:
+      state: "present"
+      vdom:  "{{ vdom }}"
+      interface: "{{ port_channel }}"
+      type: "vlan"
+      vlanid: "{{ item.id  }}"
+      mode: "static"
+      ip: "{{ item.ip  }} 255.255.255.0"
+      allowaccess: ['https', 'ping']
+      name: "{{ item.vlan_name }}"
+      device_identification: enable
+  with_items:
+    - "{{ vlans }}"
+    
+- name: Configurando Router Static
+  fortios_router_static:
+    host: "{{ fortigate_host }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    https: "True"
+    ssl_verify: "False"
+    vdom: "{{ vdom }}"
+    state: present
+    router_static:
+      distance: 10
+      dst: 0.0.0.0 0.0.0.0
+      gateway: 192.168.0.254
+      status: enable
+      device: WAN
+      
+- name: Configurando IP Pool
+  fortios_firewall_ippool:
+    host: "{{ fortigate_host }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    https: "True"
+    ssl_verify: "False"
+    vdom: "{{ vdom }}"
+    state: present
+    firewall_ippool:
+      name: "pool {{ vdom }}"
+      startip: 192.168.0.1
+      endip: 192.168.0.1
+      type: overload
+      
+- name: Configurando policy
+  fortios_firewall_policy:
+    host: "{{ fortigate_host }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    https: "True"
+    ssl_verify: "False"
+    vdom: "{{ vdom }}"
+    state: present
+    firewall_policy:
+      state: "present"
+      policyid: "2002"
+      name: "Policy {{ vdom }}"
+      action: "deny"
+      srcintf:
+        - name: DMZ
+      dstintf:
+        - name: WAN
+      srcaddr: 
+        - name: 'all'
+      dstaddr:
+        - name: 'all'
+      service: 
+        - name: 'ALL'
+      schedule: "always"      
+      ippool: enable
+      poolname: 
+        - name: "pool {{ vdom }}"
+      nat: enable
+      
+...

@@ -1,0 +1,32 @@
+---
+    - name: Criando VPC com as interfaces físicas.
+      ansible.windows.win_powershell:
+        script: |
+          New-NetLbfoTeam -Name 'VPC' -TeamMembers 'PCIe Slot 1 Port 2','PCIe Slot 2 Port 1' -TeamingMode 'LACP' -LoadBalancingAlgorithm 'Dynamic' -a
+          
+    - name: Pausando por 30 segundos
+      pause:
+        minutes: 0.5
+    
+    - name: Fixando o IP na VPC.
+      ansible.windows.win_powershell:
+        script: |
+          New-NetIPAddress {{ ip_bond }} -InterfaceAlias VPC -DefaultGateway {{ gateway_bond }} -AddressFamily IPV4 -PrefixLength 24
+          
+    - name: Registrando saída
+      ansible.windows.win_powershell:
+        script: |
+          Get-NetIPConfiguration  
+      register: output
+      
+    - name:
+      set_fact:
+        output: "{{ output }}"
+    - name:  
+      debug:
+        msg: " {{ output }} "
+        
+    - name:  
+      debug:
+        msg: " O VPC foi criado com o IP {{ ip_bond }} "
+...

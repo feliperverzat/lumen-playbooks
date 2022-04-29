@@ -1,0 +1,33 @@
+---
+- name: Criando Bridge Domain "{{ BD }}"
+  aci_bd:
+    hostname: "{{ inventory_hostname }}"
+    username: "{{ lookup('env','APIC_USER')}}"
+    password: "{{ lookup('env','APIC_PASS')}}"
+    tenant: "{{ TENANT }}-{{ VLAN }}"
+    bd: "{{ BD }}-{{ item }}-{{ VLAN }}"
+    vrf: "{{ VRF }}-{{ VLAN }}"
+    state: present
+    validate_certs: no
+  loop: "{{ ENV }}"
+  register: create_bd_output
+
+- debug:
+    msg: "{{ BD }} criado com sucesso"
+  when: create_bd_output.changed == true and create_vrf_output.failed == false
+
+- name: Associando L3Out em Bridge Domain "{{ BD }}"
+  aci_bd_to_l3out :
+    hostname: "{{ inventory_hostname }}"
+    username: "{{ lookup('env','APIC_USER')}}"
+    password: "{{ lookup('env','APIC_PASS')}}"
+    l3out: "L3out-TRANSITO_FG1"
+    tenant: "{{ TENANT }}-{{ VLAN }}"
+    bd: "{{ BD }}-{{ item }}-{{ VLAN }}"
+    state: present
+    validate_certs: no
+  loop: "{{ ENV }}"
+  register: associate_l3out_output
+
+- debug:
+    msg: "{{ associate_l3out_output }}"

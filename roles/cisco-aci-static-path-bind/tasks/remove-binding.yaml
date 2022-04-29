@@ -1,0 +1,15 @@
+---
+- name: Remove Static Path binding for given EPG
+  aci_static_binding_to_epg:
+    hostname: "{{ inventory_hostname }}"
+    username: "{{ lookup('env','APIC_USER')}}"
+    password: "{{ lookup('env','APIC_PASS')}}"
+    tenant: tn-batatinha_frita123-001
+    ap: app-batatinha_frita123
+    epg: epg-batatinha_frita123-back-001
+    interface_type: switch_port
+    pod_id: 1
+    leafs: 127
+    interface: 1/26
+    state: absent
+    validate_certs: no

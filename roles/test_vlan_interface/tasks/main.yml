@@ -1,0 +1,18 @@
+---
+  - name: Configure vlan.7
+    collections:
+    - paloaltonetworks.panos
+    panos_vlan_interface:
+      provider: '{{ palo_provider }}'
+      name: "vlan.7"
+      ip: ["10.1.1.1/24"]
+      management_profile: "allow ping"
+      vlan_name: "dmz"
+      zone_name: "L3-untrust"
+      vr_name: "default"
+  - name: commit candidate configs on firewall
+    collections:
+    - paloaltonetworks.panos  
+    panos_commit_firewall:
+      provider: '{{ palo_provider }}'
+...

@@ -1,0 +1,16 @@
+- name: Get specific Static Path binding for given EPG
+  aci_static_binding_to_epg:
+    hostname: "{{ inventory_hostname }}"
+    username: "{{ lookup('env','APIC_USER')}}"
+    password: "{{ lookup('env','APIC_PASS')}}"
+    tenant: "{{ TENANT }}"
+    ap: "{{ APP }}"
+    epg: "{{ EPG }}"
+    interface_type: switch_port
+    pod: 1
+    leafs: "{{ LEAF }}"
+    interface: '1/7'
+    state: query
+    validate_certs: no
+  delegate_to: localhost
+  register: query_result

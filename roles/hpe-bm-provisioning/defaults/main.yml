@@ -1,0 +1,9 @@
+---
+bootdevice: Pxe
+bootmode: Uefi
+ilo_user: administrator
+ilo_password: Lumen@01
+operating_system: rhel8
+operating_system_type: minimal
+state_timeout: 1800 # seconds
+uniqueid: 0

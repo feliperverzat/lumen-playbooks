@@ -1,0 +1,4 @@
+---
+management_url: https://{{ management_ip }}/redfish/v1/Systems/System.Embedded.1
+management_context: /redfish/v1/
+management_mac_address_query: 'Oem.Dell.ManagerMACAddress'

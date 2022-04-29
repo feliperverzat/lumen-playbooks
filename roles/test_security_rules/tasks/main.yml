@@ -1,0 +1,24 @@
+---
+  - name: Add a new rule on firewall
+    collections:
+    - paloaltonetworks.panos
+    panos_security_rule:
+      provider: '{{ palo_provider }}'
+      rule_name: '{{ rule_name }}'
+      description: 'Regra para {{ rule_name }}'
+      source_zone: '{{ source_zone }}' 
+      destination_zone: '{{ destination_zone }}'
+      source_ip: any
+      destination_ip: any
+      category: any
+      application: any
+      vsys: '{{ vsys }}'
+      service: '{{ service }}'
+      action: 'allow'
+      
+  - name: commit candidate configs on firewall
+    collections:
+    - paloaltonetworks.panos  
+    panos_commit_firewall:
+      provider: '{{ palo_provider }}'
+...

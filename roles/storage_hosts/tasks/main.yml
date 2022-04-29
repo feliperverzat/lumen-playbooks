@@ -1,0 +1,55 @@
+---
+  - name: Create new host
+    purefa_host:
+      host: HV4-{{ cliente }}-{{ server_id }}
+      protocol: fc
+      wwns:
+        - "{{ wwn1 }}"
+        - "{{ wwn2 }}"
+      volume: hv4-{{ cliente }}-{{ server_id }}-vol{{ vol_id }}
+      state: present
+      fa_url: 10.220.14.5
+      api_token: 2475f960-2a79-21d0-5994-ef374bde6689
+
+- name: Prepare for host verification
+  block:
+    - name: Create local temporary directory for this execution
+      tempfile:
+        state: directory
+        suffix: "{{ monitoring_filename }}"
+      register: tempfolder    
+      delegate_to: 127.0.0.1
+
+    - name: Create remote temporary directory for this execution
+      tempfile:
+        state: directory
+        suffix: "{{ monitoring_filename }}"
+      register: remote_tempfolder
+
+    - name: Download 
+        url: http://{{ file_server }}/archive/rhel/monitoring/latest/{{ monitoring_setup_executable }}
+        dest: "{{ tempfolder.path }}"
+        checksum: sha256:http://{{ file_server }}/archive/rhel/monitoring/latest/{{ monitoring_setup_executable }}.sha256.txt
+        mode: '0700'
+      delegate_to: 127.0.0.1
+
+    - name: dependencies
+      get_url:
+        url: "http://{{ file_server }}/archive/rhel/monitoring/deps/{{ item }}"
+        dest: "{{ tempfolder.path }}"
+        mode: '0700'
+      with_items:
+        - host
+        - wwn 1
+        - wwn 2
+      delegate_to: 127.0.0.1      
+      
+  rescue:
+    - name: Failed to create local temporary directory and retrieve binaries
+      fail:
+        msg: "[ERROR] [E0100] Failure while creating temporary directory and retrieving binaries from central repository. Please check if the central repository URL is accessible and there is enough space on Ansible Tower node filesystem."
+
+
+
+
+...

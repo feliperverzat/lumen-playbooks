@@ -1,0 +1,9 @@
+---
+ENV:
+  - dmz
+  - front
+  - back
+
+dmz_subnet: "192.168.100.0/24"
+front_subnet: "10.0.50.0/24"
+back_subnet: "172.16.0.0/24"
