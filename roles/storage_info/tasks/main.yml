@@ -11,6 +11,6 @@
       info_hosts: "{{ array_info | json_query('purefa_info.hosts.*.wwn') }}"
   - name: show configuration information
     debug: 
-      msg: "{{ info_hosts | regex_replace('[^A-Z 0-9]', '') | regex_replace('[^A-Z0-9]', '"\n"') }}"
+      msg: "{{ info_hosts | regex_replace('[^A-Z 0-9]', '') | regex_replace('[^A-Z0-9]', '|') }}"
 
 #'purefa_info.hosts.*.wwn'
