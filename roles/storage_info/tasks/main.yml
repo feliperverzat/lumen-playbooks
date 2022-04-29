@@ -16,7 +16,7 @@
     debug:
       msg: "É diferente isso"
     when:
-    - wwn1 is item == 0
+    - wwn1 in item == 0
     with_items: "{{ info_hosts_list }}"
     run_once: "true"
     
